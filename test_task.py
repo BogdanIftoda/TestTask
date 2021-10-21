@@ -8,16 +8,6 @@ connection = sqlite3.connect('test.db')
 cur = connection.cursor()
 
 
-def show_records(result):
-    if len(result) != 0:
-        print('----------')
-        for row in result:
-            print(*row)
-        print('----------')
-    else:
-        print("No records")
-
-
 def add_records():
     while True:
         user_input = input("Enter category and money: ")
@@ -42,6 +32,22 @@ def add_records():
             print("Record added")
 
 
+def show_records(category_name=None):
+    if category_name:
+        cur.execute("SELECT * FROM category where name=:category_name;",
+                    {"category_name": category_name})
+    else:
+        cur.execute("SELECT * FROM category;")
+    result = cur.fetchall()
+    if len(result) != 0:
+        print('----------')
+        for row in result:
+            print(*row)
+        print('----------')
+    else:
+        print("No records")
+
+
 while True:
     input_value = input('''
 Choose what you need, enter number:
@@ -56,17 +62,12 @@ Choose what you need, enter number:
     elif int(input_value) == 1:
         add_records()
     elif int(input_value) == 2:
-        cur.execute("SELECT * FROM category;")
-        result = cur.fetchall()
         print("\nAll records")
-        show_records(result)
+        show_records()
     elif int(input_value) == 3:
         category_name = input("Enter category name: ")
-        cur.execute("SELECT * FROM category where name=:category_name;",
-                    {"category_name": category_name})
-        result = cur.fetchall()
         print(f"\nCategory {category_name}")
-        show_records(result)
+        show_records(category_name)
     elif int(input_value) == 4:
         cur.execute("DELETE FROM category;")
         connection.commit()
